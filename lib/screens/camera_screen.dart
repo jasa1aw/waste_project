@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:razdelchik/services/trash_analysis_service.dart';
 import 'package:razdelchik/screens/result_screen.dart';
-import 'package:razdelchik/main.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -63,40 +61,6 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  Future<void> _takePicture() async {
-    if (_controller == null || !_controller!.value.isInitialized) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Камера не инициализирована')),
-      );
-      return;
-    }
-
-    try {
-      final XFile photo = await _controller!.takePicture();
-      if (!mounted) return;
-
-      final savedPath = await _analysisService.saveImageToLocal(photo.path);
-      if (!mounted) return;
-
-      final result = await _analysisService.analyzeImage(savedPath);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultScreen(
-            imagePath: savedPath,
-            analysisResult: result,
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка при съемке: $e')),
-      );
-    }
-  }
-
   Future<void> _pickImage() async {
     try {
       final ImagePicker picker = ImagePicker();
@@ -114,6 +78,7 @@ class _CameraScreenState extends State<CameraScreen> {
       if (!mounted) return;
 
       final result = await _analysisService.analyzeImage(savedPath);
+      if (!mounted) return;
 
       Navigator.push(
         context,
@@ -140,7 +105,8 @@ class _CameraScreenState extends State<CameraScreen> {
         _isLoading = true;
       });
       try {
-        final savedPath = await _analysisService.saveImageToLocal(pickedFile.path);
+        final savedPath =
+            await _analysisService.saveImageToLocal(pickedFile.path);
         final result = await _analysisService.analyzeImage(savedPath);
         if (mounted) {
           Navigator.push(
@@ -154,6 +120,7 @@ class _CameraScreenState extends State<CameraScreen> {
           );
         }
       } catch (e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Ошибка: $e')),
         );
@@ -185,6 +152,12 @@ class _CameraScreenState extends State<CameraScreen> {
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
               Text(_errorMessage ?? 'Произошла ошибка'),
+              const SizedBox(height: 8),
+              Text(
+                'На симуляторе камера недоступна. Используйте галерею.',
+                style: TextStyle(color: Colors.grey.shade700),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _pickImage,
@@ -197,84 +170,105 @@ class _CameraScreenState extends State<CameraScreen> {
     }
 
     if (!_isCameraInitialized) {
-      return const Scaffold(
-        body: Center(
+      return Scaffold(
+        appBar: AppBar(title: const Text('Камера')),
+        body: const Center(
           child: CircularProgressIndicator(),
         ),
       );
     }
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.green.shade100, Colors.green.shade50],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Сделай фото или выбери из галереи, чтобы узнать, как правильно утилизировать отходы!',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade800,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+      appBar: AppBar(
+        title: const Text('Камера'),
+        backgroundColor: Colors.green.shade100,
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.green.shade100, Colors.green.shade50],
               ),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: _isLoading ? null : () => _getImage(ImageSource.camera),
-                        icon: Icon(Icons.camera_alt, color: Colors.white),
-                        label: Text('Сделать фото', style: TextStyle(color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Сделай фото или выбери из галереи, чтобы узнать, как правильно утилизировать отходы!',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade800,
                       ),
-                      SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: _isLoading ? null : () => _getImage(ImageSource.gallery),
-                        icon: Icon(Icons.photo_library, color: Colors.white),
-                        label: Text('Выбрать из галереи', style: TextStyle(color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (_isLoading)
-                Container(
-                  color: Colors.black.withOpacity(0.5),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                ),
-            ],
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: _isLoading
+                                ? null
+                                : () => _getImage(ImageSource.camera),
+                            icon: const Icon(Icons.camera_alt,
+                                color: Colors.white),
+                            label: const Text('Сделать фото',
+                                style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton.icon(
+                            onPressed: _isLoading
+                                ? null
+                                : () => _getImage(ImageSource.gallery),
+                            icon: const Icon(Icons.photo_library,
+                                color: Colors.white),
+                            label: const Text('Выбрать из галереи',
+                                style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
-} 
+}

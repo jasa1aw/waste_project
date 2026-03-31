@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:razdelchik/services/notifications_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,6 +13,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _apiKeyController = TextEditingController();
   bool _isLoading = true;
+  bool _remindersEnabled = true;
 
   @override
   void initState() {
@@ -22,10 +24,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadApiKey() async {
     final prefs = await SharedPreferences.getInstance();
     final savedApiKey = prefs.getString('openrouter_api_key') ?? '';
+    final remindersEnabled = prefs.getBool('sorting_reminders_enabled') ?? true;
     setState(() {
       _apiKeyController.text = savedApiKey;
+      _remindersEnabled = remindersEnabled;
       _isLoading = false;
     });
+  }
+
+  Future<void> _setRemindersEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sorting_reminders_enabled', enabled);
+    await NotificationsService.instance.setRemindersEnabled(enabled);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _remindersEnabled = enabled;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          enabled
+              ? 'Напоминания о сортировке включены'
+              : 'Напоминания о сортировке отключены',
+        ),
+      ),
+    );
   }
 
   Future<void> _saveApiKey() async {
@@ -198,6 +223,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Card(
+                      color: Colors.white,
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: SwitchListTile.adaptive(
+                        value: _remindersEnabled,
+                        onChanged: _setRemindersEnabled,
+                        title: const Text('Напоминания о сортировке'),
+                        subtitle: const Text('FCM-уведомления о ежедневной сортировке.'),
                       ),
                     ),
                     const SizedBox(height: 24),

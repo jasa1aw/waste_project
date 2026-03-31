@@ -5,7 +5,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TrashAnalysisService {
- 
+  static const List<String> _modelFallbacks = <String>[
+    'google/gemini-2.0-flash-001',
+    'google/gemini-2.0-flash-lite-001',
+    'google/gemini-1.5-flash',
+  ];
+
   static const String _universalPrompt = '''
 " Ты — опытный эколог и эксперт по сортировке отходов. Твоя задача — помочь мне определить и правильно утилизировать отходы, изображённые на приложенном фото.
 При анализе изображения, пожалуйста:
@@ -43,7 +48,8 @@ class TrashAnalysisService {
     try {
       final apiKey = await _getApiKey();
       if (apiKey == null || apiKey.isEmpty) {
-        throw Exception('API ключ не найден. Пожалуйста, укажите ваш API ключ в настройках.');
+        throw Exception(
+            'API ключ не найден. Пожалуйста, укажите ваш API ключ в настройках.');
       }
 
       final file = File(imagePath);
@@ -55,52 +61,81 @@ class TrashAnalysisService {
       final dataUrl = 'data:image/jpeg;base64,$base64Image';
 
       final url = Uri.parse('https://openrouter.ai/api/v1/chat/completions');
-      final body = {
-        "model": "google/gemini-2.0-flash-exp:free",
-        "messages": [
-          {
-            "role": "user",
-            "content": [
-              {"type": "text", "text": _universalPrompt},
-              {
-                "type": "image_url",
-                "image_url": {"url": dataUrl}
-              }
-            ]
-          }
-        ]
-      };
+      Exception? lastModelError;
 
-      final response = await http.post(
-        url,
-        headers: {
-          "Authorization": "Bearer $apiKey",
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode(body),
-      );
+      for (final model in _modelFallbacks) {
+        final body = {
+          "model": model,
+          "messages": [
+            {
+              "role": "user",
+              "content": [
+                {"type": "text", "text": _universalPrompt},
+                {
+                  "type": "image_url",
+                  "image_url": {"url": dataUrl}
+                }
+              ]
+            }
+          ]
+        };
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final rawResponse = data['choices'][0]['message']['content'];
-        
-        return _formatResponse(rawResponse);
-      } else {
-        throw Exception('Ошибка OpenRouter: ${response.statusCode}\n${response.body}');
+        final response = await http.post(
+          url,
+          headers: {
+            "Authorization": "Bearer $apiKey",
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode(body),
+        );
+
+        if (response.statusCode == 200) {
+          final dynamic data = jsonDecode(response.body);
+          final String rawResponse =
+              data['choices'][0]['message']['content'] as String;
+          return _formatResponse(rawResponse);
+        }
+
+        if (_isMissingModelEndpoint(response)) {
+          lastModelError =
+              Exception('Модель $model недоступна: ${response.statusCode}');
+          continue;
+        }
+
+        throw Exception(
+            'Ошибка OpenRouter: ${response.statusCode}\n${response.body}');
       }
+
+      throw lastModelError ??
+          Exception(
+              'Не удалось подобрать доступную модель OpenRouter для анализа изображения.');
     } catch (e) {
       throw Exception('Ошибка при анализе изображения: $e');
     }
   }
 
+  bool _isMissingModelEndpoint(http.Response response) {
+    if (response.statusCode != 404 && response.statusCode != 400) {
+      return false;
+    }
+
+    final bodyLower = response.body.toLowerCase();
+    return bodyLower.contains('no endpoints found') ||
+        bodyLower.contains('model not found') ||
+        bodyLower.contains('unknown model');
+  }
+
   String _formatResponse(String rawResponse) {
-    
     final cleanedResponse = rawResponse.trim().replaceAll(RegExp(r'\s+'), ' ');
-    
-    final withoutNumbers = cleanedResponse.replaceAll(RegExp(r'^\d+\.\s*', multiLine: true), '');
-    
-    final sentences = withoutNumbers.split(RegExp(r'[.!?]')).where((s) => s.trim().isNotEmpty).toList();
-    return sentences.map((s) => s.trim()).join('. ') + '.';
+
+    final withoutNumbers =
+        cleanedResponse.replaceAll(RegExp(r'^\d+\.\s*', multiLine: true), '');
+
+    final sentences = withoutNumbers
+        .split(RegExp(r'[.!?]'))
+        .where((s) => s.trim().isNotEmpty)
+        .toList();
+    return '${sentences.map((s) => s.trim()).join('. ')}.';
   }
 
   Future<String> saveImageToLocal(String imagePath) async {
@@ -115,4 +150,4 @@ class TrashAnalysisService {
       throw Exception('Ошибка при сохранении изображения: $e');
     }
   }
-} 
+}

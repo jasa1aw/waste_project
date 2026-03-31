@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "581025774991",
+    "project_id": "waste-a2ae0",
+    "storage_bucket": "waste-a2ae0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581025774991:android:043cfea79ac81562ba9ffa",
+        "android_client_info": {
+          "package_name": "com.example.temp_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoGG8zCH22xR2qVqOtpAPCY7bQxhac9TM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

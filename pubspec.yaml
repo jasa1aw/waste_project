@@ -21,6 +21,14 @@ dependencies:
   flutter_native_splash: ^2.3.10
   flutter_launcher_icons: ^0.13.1
   url_launcher: ^6.2.4
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.6.2
+  cloud_firestore: ^5.6.11
+  cloud_functions: ^5.6.2
+  firebase_messaging: ^15.2.10
+  fl_chart: ^0.69.2
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
 
 dev_dependencies:
   flutter_test:
@@ -36,8 +44,8 @@ flutter:
     - assets/icons/
 
 flutter_native_splash:
-  color: "#4CAF50"
-  image: assets/images/splash_logo.png
+  color: "#FFFFFF"
+  image: assets/images/generated_splash_logo.png
   android: true
   ios: true
   web: false
