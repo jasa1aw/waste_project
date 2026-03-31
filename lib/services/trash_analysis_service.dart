@@ -47,6 +47,7 @@ class TrashAnalysisService {
   Future<String> analyzeImage(String imagePath) async {
     try {
       final apiKey = await _getApiKey();
+      // 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
       if (apiKey == null || apiKey.isEmpty) {
         throw Exception(
             'API ключ не найден. Пожалуйста, укажите ваш API ключ в настройках.');
