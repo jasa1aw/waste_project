@@ -14,7 +14,7 @@ class StatsScreen extends StatelessWidget {
     if (user == null) {
       return const Scaffold(
         body: Center(
-          child: Text('Войдите, чтобы увидеть статистику'),
+          child: Text('Статистиканы көру үшін кіріңіз'),
         ),
       );
     }
@@ -31,12 +31,12 @@ class StatsScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Ошибка: ${snapshot.error}'));
+            return Center(child: Text('Қате: ${snapshot.error}'));
           }
 
           final stats = snapshot.data;
           if (stats == null) {
-            return const Center(child: Text('Нет данных'));
+            return const Center(child: Text('Деректер жоқ'));
           }
 
           return ListView(
@@ -49,11 +49,11 @@ class StatsScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Всего отсортировано',
+                        Text('Барлығы сұрыпталды',
                             style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 4),
                         Text(
-                          '${stats.totalItems} предметов',
+                          '${stats.totalItems} зат',
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ],
@@ -108,13 +108,13 @@ class StatsScreen extends StatelessWidget {
                               showTitles: true,
                               getTitlesWidget: (value, meta) {
                                 const labels = [
-                                  'Пн',
-                                  'Вт',
+                                  'Дс',
+                                  'Сс',
                                   'Ср',
-                                  'Чт',
-                                  'Пт',
+                                  'Бс',
+                                  'Жм',
                                   'Сб',
-                                  'Вс'
+                                  'Жк'
                                 ];
                                 final index = value.toInt();
                                 if (index < 0 || index > 6) {
@@ -160,12 +160,29 @@ class StatsScreen extends StatelessWidget {
         .map(
           (entry) => PieChartSectionData(
             value: entry.value.toDouble(),
-            title: '${entry.key.name}: ${entry.value}',
+            title: '${_typeLabel(entry.key)}: ${entry.value}',
             radius: 70,
             color: _colorForType(entry.key),
           ),
         )
         .toList();
+  }
+
+  String _typeLabel(WasteType type) {
+    switch (type) {
+      case WasteType.plastic:
+        return 'Пластик';
+      case WasteType.paper:
+        return 'Қағаз';
+      case WasteType.glass:
+        return 'Шыны';
+      case WasteType.metal:
+        return 'Металл';
+      case WasteType.organic:
+        return 'Органика';
+      case WasteType.unknown:
+        return 'Белгісіз';
+    }
   }
 
   Color _colorForType(WasteType type) {
@@ -205,13 +222,13 @@ class _BasicReports extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Базовый отчет', style: Theme.of(context).textTheme.titleMedium),
+        Text('Негізгі есеп', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        Text('Лидер по типу отхода: $topType'),
+        Text('Ең көп таралған қалдық түрі: $topType'),
         const SizedBox(height: 4),
-        Text('Доля перерабатываемых: $recyclableShare%'),
+        Text('Қайта өңделетіндердің үлесі: $recyclableShare%'),
         const SizedBox(height: 4),
-        Text('Оценка эко-вклада: ~ $ecoImpactKg кг сохраненных ресурсов'),
+        Text('Эко-үлес бағасы: шамамен $ecoImpactKg кг сақталған ресурстар'),
       ],
     );
   }
@@ -220,16 +237,16 @@ class _BasicReports extends StatelessWidget {
     final filtered = Map<WasteType, int>.from(byType)
       ..remove(WasteType.unknown);
     if (filtered.isEmpty) {
-      return 'нет данных';
+      return 'деректер жоқ';
     }
     final entry = filtered.entries.reduce((a, b) => a.value >= b.value ? a : b);
     return switch (entry.key) {
-      WasteType.plastic => 'Plastic',
-      WasteType.paper => 'Paper',
-      WasteType.glass => 'Glass',
-      WasteType.metal => 'Metal',
-      WasteType.organic => 'Organic',
-      WasteType.unknown => 'Unknown',
+      WasteType.plastic => 'Пластик',
+      WasteType.paper => 'Қағаз',
+      WasteType.glass => 'Шыны',
+      WasteType.metal => 'Металл',
+      WasteType.organic => 'Органика',
+      WasteType.unknown => 'Белгісіз',
     };
   }
 }

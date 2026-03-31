@@ -14,10 +14,10 @@ class AppUser {
   final DateTime createdAt;
 
   String get level {
-    if (ecoPoints >= 1000) return 'Eco Hero';
-    if (ecoPoints >= 400) return 'Eco Expert';
-    if (ecoPoints >= 150) return 'Eco Learner';
-    return 'Beginner';
+    if (ecoPoints >= 1000) return 'Эко батыр';
+    if (ecoPoints >= 400) return 'Эко сарапшы';
+    if (ecoPoints >= 150) return 'Эко үйренуші';
+    return 'Бастаушы';
   }
 
   Map<String, dynamic> toMap() {

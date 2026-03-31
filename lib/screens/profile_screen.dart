@@ -23,7 +23,7 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Вы не авторизованы'),
+              const Text('Сіз жүйеге кірмегенсіз'),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () {
@@ -32,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const AuthScreen()),
                   );
                 },
-                child: const Text('Войти / Зарегистрироваться'),
+                child: const Text('Кіру / Тіркелу'),
               ),
             ],
           ),
@@ -55,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
               Navigator.pop(context);
             },
             icon: const Icon(Icons.logout),
-            tooltip: 'Выйти',
+            tooltip: 'Шығу',
           ),
         ],
       ),
@@ -89,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            profile?.name ?? 'Пользователь',
+                            profile?.name ?? 'Пайдаланушы',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 2),
@@ -105,7 +105,7 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Eco-поинты',
+                    Text('Эко-ұпайлар',
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 6),
                     Text(
@@ -123,11 +123,11 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Уровень',
+                    Text('Деңгей',
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 6),
                     Text(
-                      profile?.level ?? 'Beginner',
+                      profile?.level ?? 'Бастаушы',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 12),
@@ -149,17 +149,17 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Достижения',
+                    Text('Жетістіктер',
                         style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 10),
                     const Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: [
-                        _BadgeChip(label: 'First Scan', color: AppTheme.glass),
+                        _BadgeChip(label: 'Алғашқы сканерлеу', color: AppTheme.glass),
                         _BadgeChip(
-                            label: 'Eco Starter', color: AppTheme.plastic),
-                        _BadgeChip(label: 'Sort 100', color: AppTheme.metal),
+                            label: 'Эко бастаушы', color: AppTheme.plastic),
+                        _BadgeChip(label: 'Сұрыптау 100', color: AppTheme.metal),
                       ],
                     ),
                   ],
@@ -175,7 +175,7 @@ class ProfileScreen extends StatelessWidget {
                   );
                 },
                 icon: Icons.camera_alt,
-                label: 'К сортировке',
+                label: 'Сұрыптауға өту',
               ),
               const SizedBox(height: 12),
               PremiumActionButton(
@@ -187,7 +187,7 @@ class ProfileScreen extends StatelessWidget {
                   );
                 },
                 icon: Icons.bar_chart,
-                label: 'Открыть статистику',
+                label: 'Статистиканы ашу',
                 backgroundColor: const Color(0xFF0D9488),
               ),
               const SizedBox(height: 12),
@@ -200,7 +200,7 @@ class ProfileScreen extends StatelessWidget {
                   );
                 },
                 icon: Icons.emoji_events_outlined,
-                label: 'Глобальный рейтинг',
+                label: 'Жаһандық рейтинг',
                 backgroundColor: const Color(0xFF475569),
               ),
             ],

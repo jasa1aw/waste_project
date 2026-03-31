@@ -62,7 +62,7 @@ class _ResultScreenState extends State<ResultScreen> {
       }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Не удалось сохранить историю сканирования.')),
+            content: Text('Сканерлеу тарихын сақтау мүмкін болмады.')),
       );
     } finally {
       if (mounted) {
@@ -76,63 +76,63 @@ class _ResultScreenState extends State<ResultScreen> {
   ResultInsights _buildInsights(String rawText) {
     final text = rawText.toLowerCase();
 
-    if (text.contains('пласт') || text.contains('бутыл')) {
+    if (text.contains('пласт') || text.contains('бутыл') || text.contains('бөтелке')) {
       return const ResultInsights(
-        itemName: 'Пластиковый отход',
+        itemName: 'Пластик қалдық',
         type: WasteType.plastic,
         category: WasteCategory.recyclable,
-        binColor: 'оранжевый',
-        reason: 'Пластик подлежит переработке после промывки и сортировки.',
+        binColor: 'қызғылт сары',
+        reason: 'Пластикті жуып, сұрыптағаннан кейін қайта өңдеуге болады.',
       );
     }
-    if (text.contains('бумаг') || text.contains('картон')) {
+    if (text.contains('бумаг') || text.contains('картон') || text.contains('қағаз')) {
       return const ResultInsights(
-        itemName: 'Бумажный отход',
+        itemName: 'Қағаз қалдық',
         type: WasteType.paper,
         category: WasteCategory.recyclable,
-        binColor: 'синий',
+        binColor: 'көк',
         reason:
-            'Бумагу и картон принимают в макулатуру, если они сухие и чистые.',
+            'Қағаз бен картон құрғақ және таза болса, макулатураға қабылданады.',
       );
     }
-    if (text.contains('стек')) {
+    if (text.contains('стек') || text.contains('шыны') || text.contains('әйнек')) {
       return const ResultInsights(
-        itemName: 'Стеклянный отход',
+        itemName: 'Шыны қалдық',
         type: WasteType.glass,
         category: WasteCategory.recyclable,
-        binColor: 'зеленый',
+        binColor: 'жасыл',
         reason:
-            'Стекло хорошо перерабатывается и может использоваться многократно.',
+            'Шыны жақсы қайта өңделеді және бірнеше рет қолданыла алады.',
       );
     }
-    if (text.contains('металл') || text.contains('банк')) {
+    if (text.contains('металл') || text.contains('банк') || text.contains('темір') || text.contains('қалбыр')) {
       return const ResultInsights(
-        itemName: 'Металлический отход',
+        itemName: 'Металл қалдық',
         type: WasteType.metal,
         category: WasteCategory.recyclable,
-        binColor: 'красный',
-        reason: 'Металлы перерабатываются и снижают добычу новых ресурсов.',
+        binColor: 'қызыл',
+        reason: 'Металдар қайта өңделеді және жаңа ресурстарды өндіруді азайтады.',
       );
     }
-    if (text.contains('орган') || text.contains('пищ')) {
+    if (text.contains('орган') || text.contains('пищ') || text.contains('тамақ') || text.contains('азық')) {
       return const ResultInsights(
-        itemName: 'Органический отход',
+        itemName: 'Органикалық қалдық',
         type: WasteType.organic,
         category: WasteCategory.nonRecyclable,
-        binColor: 'черный',
+        binColor: 'қара',
         reason:
-            'Органика обычно не идет в сухую переработку и требует отдельного сбора.',
+            'Органика әдетте құрғақ қайта өңдеуге жіберілмейді және бөлек жинауды қажет етеді.',
       );
     }
 
     return const ResultInsights(
-      itemName: 'Неопределенный тип отхода',
+      itemName: 'Белгісіз қалдық түрі',
       type: WasteType.unknown,
       category: WasteCategory.nonRecyclable,
-      binColor: 'красный',
-      reason: 'Тип не определен точно, проверьте похожие варианты вручную.',
+      binColor: 'қызыл',
+      reason: 'Түрі нақты анықталмады, ұқсас нұсқаларды қолмен тексеріңіз.',
       suggestion:
-          'Похоже на пластик или комбинированную упаковку. Уточните состав по маркировке.',
+          'Пластикке немесе аралас қаптамаға ұқсайды. Құрамын таңбалау арқылы нақтылаңыз.',
     );
   }
 
@@ -144,7 +144,7 @@ class _ResultScreenState extends State<ResultScreen> {
       backgroundColor: Colors.green.shade50,
       appBar: AppBar(
         backgroundColor: Colors.green.shade100,
-        title: const Text('Результат анализа'),
+        title: const Text('Талдау нәтижесі'),
         iconTheme: IconThemeData(color: Colors.green.shade900),
         titleTextStyle: TextStyle(
           color: Colors.green.shade900,
@@ -191,7 +191,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         Icon(Icons.eco, size: 48, color: Colors.green.shade700),
                         const SizedBox(height: 12),
                         Text(
-                          'Тип отхода:',
+                          'Қалдық түрі:',
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.green.shade800,
@@ -220,7 +220,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         if (insights.suggestion != null) ...[
                           const SizedBox(height: 14),
                           Text(
-                            'AI-подсказка: ${insights.suggestion}',
+                            'AI-кеңесі: ${insights.suggestion}',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
@@ -264,7 +264,7 @@ class _ResultScreenState extends State<ResultScreen> {
                   ),
                   icon: const Icon(Icons.home),
                   label:
-                      const Text('На главную', style: TextStyle(fontSize: 18)),
+                      const Text('Басты бетке', style: TextStyle(fontSize: 18)),
                   onPressed: () {
                     Navigator.popUntil(context, (route) => route.isFirst);
                   },

@@ -13,7 +13,27 @@ class MapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Пункты приема')),
+      appBar: AppBar(
+        title: const Text('Қабылдау пункттері'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Деректерді жаңарту',
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Деректер жаңартылуда...')),
+              );
+              RecyclingPointsService().deleteAndReseedPoints().then((_) {
+                 if(context.mounted) {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                     const SnackBar(content: Text('Дайын!')),
+                   );
+                 }
+              });
+            },
+          ),
+        ],
+      ),
       body: StreamBuilder<List<RecyclingPoint>>(
         stream: RecyclingPointsService().watchPoints(),
         builder: (context, snapshot) {
@@ -22,7 +42,7 @@ class MapScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Ошибка карты: ${snapshot.error}'));
+            return Center(child: Text('Карта қатесі: ${snapshot.error}'));
           }
 
           final points = snapshot.data ?? const <RecyclingPoint>[];
@@ -74,7 +94,7 @@ class MapScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text(
-                          'Пункты приема пока не добавлены. Заполнить тестовыми данными Астаны и Караганды?',
+                          'Қабылдау пункттері әлі қосылмаған. Астана мен Қарағандының тесттік деректерімен толтыру керек пе?',
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 12),
@@ -82,7 +102,7 @@ class MapScreen extends StatelessWidget {
                           onPressed: () {
                             RecyclingPointsService().seedInitialPoints();
                           },
-                          child: const Text('Добавить точки'),
+                          child: const Text('Нүктелерді қосу'),
                         ),
                       ],
                     ),
@@ -141,7 +161,7 @@ class MapScreen extends StatelessWidget {
                 children: point.acceptedTypes
                     .map(
                       (type) => Chip(
-                        label: Text(type),
+                        label: Text(_translateType(type)),
                         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                         side: BorderSide.none,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -154,5 +174,22 @@ class MapScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  String _translateType(String type) {
+    switch (type.toLowerCase()) {
+      case 'plastic':
+        return 'Пластик';
+      case 'paper':
+        return 'Қағаз';
+      case 'glass':
+        return 'Шыны';
+      case 'metal':
+        return 'Металл';
+      case 'organic':
+        return 'Органика';
+      default:
+        return type;
+    }
   }
 }

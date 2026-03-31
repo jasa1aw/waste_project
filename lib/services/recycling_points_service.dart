@@ -23,54 +23,54 @@ class RecyclingPointsService {
     final points = [
       // Астана
       {
-        'name': 'Эко-Пункт Астана Центр',
+        'name': 'Эко-Пункт Астана Орталығы',
         'location': {'lat': 51.128, 'lng': 71.430},
         'acceptedTypes': ['Plastic', 'Paper', 'Glass', 'Metal'],
-        'address': 'пр. Республики, 10, Астана',
+        'address': 'Республика даңғылы, 10, Астана',
       },
       {
-        'name': 'Прием пластика (Левый берег)',
+        'name': 'Пластик қабылдау (Сол жағалау)',
         'location': {'lat': 51.125, 'lng': 71.410},
         'acceptedTypes': ['Plastic'],
-        'address': 'ул. Сарайшык, 5, Астана',
+        'address': 'Сарайшық көшесі, 5, Астана',
       },
       {
-        'name': 'Paper Recycling Есиль',
+        'name': 'Paper Recycling Есіл',
         'location': {'lat': 51.100, 'lng': 71.400},
         'acceptedTypes': ['Paper'],
-        'address': 'пр. Кабанбай Батыра, 15, Астана',
+        'address': 'Қабанбай батыр даңғылы, 15, Астана',
       },
       {
-        'name': 'Стеклотара Астана',
+        'name': 'Шыны ыдыс Астана',
         'location': {'lat': 51.150, 'lng': 71.450},
         'acceptedTypes': ['Glass'],
-        'address': 'ул. Абая, 25, Астана',
+        'address': 'Абай көшесі, 25, Астана',
       },
       {
-        'name': 'ЭкоЦентр Органика',
+        'name': 'ЭкоОрталық Органика',
         'location': {'lat': 51.160, 'lng': 71.440},
         'acceptedTypes': ['Organic'],
-        'address': 'ул. Кенесары, 40, Астана',
+        'address': 'Кенесары көшесі, 40, Астана',
       },
 
       // Караганда
       {
-        'name': 'Эко Караганда Ресайклинг',
+        'name': 'Эко Қарағанды Ресайклинг',
         'location': {'lat': 49.801, 'lng': 73.102},
         'acceptedTypes': ['Plastic', 'Paper', 'Glass', 'Metal', 'Organic'],
-        'address': 'пр. Бухар Жырау, 20, Караганда',
+        'address': 'Бұқар жырау даңғылы, 20, Қарағанды',
       },
       {
-        'name': 'Сбор Макулатуры Центр',
+        'name': 'Макулатура жинау Орталығы',
         'location': {'lat': 49.790, 'lng': 73.110},
         'acceptedTypes': ['Paper'],
-        'address': 'ул. Нуркена Абдирова, 12, Караганда',
+        'address': 'Нұркен Әбдіров көшесі, 12, Қарағанды',
       },
       {
-        'name': 'Прием металла и пластика',
+        'name': 'Металл және пластик қабылдау',
         'location': {'lat': 49.810, 'lng': 73.090},
         'acceptedTypes': ['Metal', 'Plastic'],
-        'address': 'ул. Чкалова, 8, Караганда',
+        'address': 'Чкалов көшесі, 8, Қарағанды',
       },
     ];
 
@@ -79,5 +79,19 @@ class RecyclingPointsService {
     }
 
     await batch.commit();
+  }
+
+  Future<void> deleteAndReseedPoints() async {
+    final collection = _firestore.collection('recycling_points');
+    final snapshots = await collection.get();
+    
+    // Firestore batch supports up to 500 operations
+    final batch = _firestore.batch();
+    for (var doc in snapshots.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+    
+    await seedInitialPoints();
   }
 }

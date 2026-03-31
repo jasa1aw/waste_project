@@ -64,7 +64,7 @@ class _AuthScreenState extends State<AuthScreen> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message ?? 'Ошибка авторизации')),
+        SnackBar(content: Text(error.message ?? 'Авторизация қатесі')),
       );
     } on Exception catch (error) {
       if (!mounted) {
@@ -72,7 +72,7 @@ class _AuthScreenState extends State<AuthScreen> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка: $error')),
+        SnackBar(content: Text('Қате: $error')),
       );
     } finally {
       if (mounted) {
@@ -87,7 +87,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isLogin ? 'Вход' : 'Регистрация'),
+        title: Text(_isLogin ? 'Кіру' : 'Тіркелу'),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -102,11 +102,11 @@ class _AuthScreenState extends State<AuthScreen> {
                   if (!_isLogin) ...[
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Имя'),
+                      decoration: const InputDecoration(labelText: 'Аты'),
                       validator: (value) {
                         if (!_isLogin) {
                           if (value == null || value.trim().length < 2) {
-                            return 'Введите имя';
+                            return 'Атыңызды енгізіңіз';
                           }
                         }
                         return null;
@@ -120,7 +120,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     decoration: const InputDecoration(labelText: 'Email'),
                     validator: (value) {
                       if (value == null || !value.contains('@')) {
-                        return 'Введите корректный email';
+                        return 'Дұрыс email енгізіңіз';
                       }
                       return null;
                     },
@@ -129,10 +129,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Пароль'),
+                    decoration: const InputDecoration(labelText: 'Құпия сөз'),
                     validator: (value) {
                       if (value == null || value.trim().length < 6) {
-                        return 'Минимум 6 символов';
+                        return 'Кемінде 6 таңба';
                       }
                       return null;
                     },
@@ -146,7 +146,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             height: 18,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : Text(_isLogin ? 'Войти' : 'Создать аккаунт'),
+                        : Text(_isLogin ? 'Кіру' : 'Аккаунт құру'),
                   ),
                   const SizedBox(height: 12),
                   TextButton(
@@ -159,8 +159,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           },
                     child: Text(
                       _isLogin
-                          ? 'Нет аккаунта? Зарегистрироваться'
-                          : 'Уже есть аккаунт? Войти',
+                          ? 'Аккаунтыңыз жоқ па? Тіркелу'
+                          : 'Аккаунтыңыз бар ма? Кіру',
                     ),
                   ),
                 ],

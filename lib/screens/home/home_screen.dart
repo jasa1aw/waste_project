@@ -6,6 +6,7 @@ import 'package:razdelchik/screens/camera_screen.dart';
 import 'package:razdelchik/screens/leaderboard_screen.dart';
 import 'package:razdelchik/screens/map_screen.dart';
 import 'package:razdelchik/screens/profile_screen.dart';
+import 'package:razdelchik/screens/scan_history_screen.dart'; // Added
 import 'package:razdelchik/screens/settings_screen.dart';
 import 'package:razdelchik/screens/stats/stats_screen.dart';
 import 'package:razdelchik/services/leaderboard_service.dart';
@@ -41,14 +42,14 @@ class HomeScreen extends StatelessWidget {
               _TopBar(user: user),
               const SizedBox(height: 20),
               Text(
-                'Сортируй умно.\nЖиви экологично.',
+                'Ақылмен сұрыпта.\nЭкологиялық таза өмір сүр.',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
               ),
               const SizedBox(height: 6),
               Text(
-                'Быстро сканируй отходы и получай точные инструкции.',
+                'Қалдықтарды жылдам сканерлеп, нақты нұсқаулар ал.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(context).brightness == Brightness.light
                           ? AppTheme.textSecondaryLight
@@ -57,7 +58,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 26),
               PremiumActionButton(
-                label: 'Сканировать',
+                label: 'Сканерлеу',
                 icon: Icons.center_focus_strong,
                 onPressed: () {
                   Navigator.push(
@@ -66,6 +67,25 @@ class HomeScreen extends StatelessWidget {
                         builder: (context) => const CameraScreen()),
                   );
                 },
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: PremiumActionButton(
+                      label: 'Сканерлеу тарихы',
+                      icon: Icons.history_rounded,
+                      backgroundColor: const Color(0xFF6366F1),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ScanHistoryScreen()),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               _QuickTypesRow(),
@@ -100,7 +120,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: PremiumActionButton(
-                      label: 'Пункты приема',
+                      label: 'Қабылдау пунктері',
                       icon: Icons.map_outlined,
                       backgroundColor: const Color(0xFF2563EB),
                       onPressed: () {
@@ -118,7 +138,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: PremiumActionButton(
-                      label: 'Настройки',
+                      label: 'Баптаулар',
                       icon: Icons.tune,
                       backgroundColor: const Color(0xFF34A853),
                       onPressed: () {
@@ -169,7 +189,7 @@ class _TopBar extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               Text(
-                user?.email ?? 'Гость',
+                user?.email ?? 'Қонақ',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
@@ -184,11 +204,11 @@ class _QuickTypesRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <(String, Color, IconData)>[
-      ('Plastic', AppTheme.plastic, Icons.local_drink_outlined),
-      ('Paper', AppTheme.paper, Icons.description_outlined),
-      ('Glass', AppTheme.glass, Icons.wine_bar_outlined),
-      ('Metal', AppTheme.metal, Icons.hardware_outlined),
-      ('Organic', AppTheme.organic, Icons.spa_outlined),
+      ('Пластик', AppTheme.plastic, Icons.local_drink_outlined),
+      ('Қағаз', AppTheme.paper, Icons.description_outlined),
+      ('Шыны', AppTheme.glass, Icons.wine_bar_outlined),
+      ('Металл', AppTheme.metal, Icons.hardware_outlined),
+      ('Органика', AppTheme.organic, Icons.spa_outlined),
     ];
 
     return SingleChildScrollView(
@@ -239,7 +259,7 @@ class _StatsPreview extends StatelessWidget {
           children: [
             Text('Статистика', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 8),
-            const Text('Войдите, чтобы отслеживать прогресс и эко-поинты.'),
+            const Text('Прогресс пен эко-ұпайларды қадағалау үшін кіріңіз.'),
           ],
         ),
       );
@@ -257,7 +277,7 @@ class _StatsPreview extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text('Статистика недели',
+                    child: Text('Апта статистикасы',
                         style: Theme.of(context).textTheme.titleLarge),
                   ),
                   TextButton(
@@ -268,7 +288,7 @@ class _StatsPreview extends StatelessWidget {
                             builder: (context) => const StatsScreen()),
                       );
                     },
-                    child: const Text('Подробнее'),
+                    child: const Text('Толығырақ'),
                   ),
                 ],
               ),
@@ -278,7 +298,7 @@ class _StatsPreview extends StatelessWidget {
                 runSpacing: 10,
                 children: [
                   _MetricPill(
-                      label: 'Отсортировано',
+                      label: 'Сұрыпталды',
                       value: '${stats?.totalItems ?? 0}'),
                   _MetricPill(
                     label: 'Пластик',
@@ -343,7 +363,7 @@ class _EngagementHub extends StatelessWidget {
                   Icon(Icons.local_fire_department,
                       color: Theme.of(context).colorScheme.primary),
                   const SizedBox(width: 8),
-                  Text('Челлендж дня',
+                  Text('Күн челленджі',
                       style: Theme.of(context).textTheme.titleLarge),
                 ],
               ),
@@ -361,7 +381,7 @@ class _EngagementHub extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text('Рейтинг пользователей',
+                    child: Text('Пайдаланушылар рейтингі',
                         style: Theme.of(context).textTheme.titleLarge),
                   ),
                   TextButton(
@@ -372,13 +392,13 @@ class _EngagementHub extends StatelessWidget {
                             builder: (context) => const LeaderboardScreen()),
                       );
                     },
-                    child: const Text('Открыть'),
+                    child: const Text('Ашу'),
                   ),
                 ],
               ),
               if (user == null)
                 const Text(
-                    'Войдите, чтобы участвовать в рейтинге и видеть личный прогресс.')
+                    'Рейтингке қатысып, жеке прогресті көру үшін кіріңіз.')
               else
                 StreamBuilder(
                   stream: LeaderboardService().watchMyEntry(user!.uid),
@@ -389,10 +409,10 @@ class _EngagementHub extends StatelessWidget {
                       runSpacing: 10,
                       children: [
                         _MetricPill(
-                            label: 'Твои очки', value: '${me?.ecoPoints ?? 0}'),
+                            label: 'Сенің ұпайың', value: '${me?.ecoPoints ?? 0}'),
                         _MetricPill(
-                            label: 'Streak',
-                            value: '${me?.streakDays ?? 0} дн'),
+                            label: 'Қатарынан',
+                            value: '${me?.streakDays ?? 0} күн'),
                       ],
                     );
                   },
@@ -406,11 +426,11 @@ class _EngagementHub extends StatelessWidget {
 
   String _challengeOfDay() {
     const challenges = <String>[
-      'Отсортируй 3 пластиковых предмета сегодня.',
-      'Сделай 1 скан стекла и проверь правильный контейнер.',
-      'Собери 20 eco-поинтов за один день.',
-      'Добавь минимум 2 новых скана в историю.',
-      'Проверь сортировку бумажной упаковки и тетрапака.',
+      'Бүгін 3 пластик затты сұрыпта.',
+      '1 рет шыныны сканерлеп, дұрыс контейнерді тексер.',
+      'Бір күнде 20 эко-ұпай жина.',
+      'Тарихқа кем дегенде 2 жаңа скан қос.',
+      'Қағаз қаптамасы мен тетрапактың сұрыпталуын тексер.',
     ];
     final day = DateTime.now().day;
     return challenges[day % challenges.length];

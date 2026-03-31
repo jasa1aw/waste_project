@@ -46,8 +46,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       SnackBar(
         content: Text(
           enabled
-              ? 'Напоминания о сортировке включены'
-              : 'Напоминания о сортировке отключены',
+              ? 'Сұрыптау туралы еске салғыш қосылды'
+              : 'Сұрыптау туралы еске салғыш өшірілді',
         ),
       ),
     );
@@ -58,7 +58,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setString('openrouter_api_key', _apiKeyController.text);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('API ключ успешно сохранен')),
+        const SnackBar(content: Text('API кілті сәтті сақталды')),
       );
     }
   }
@@ -71,7 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('API ключ удален')),
+        const SnackBar(content: Text('API кілті өшірілді')),
       );
     }
   }
@@ -81,7 +81,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (!await launchUrl(url)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Не удалось открыть ссылку')),
+          const SnackBar(content: Text('Сілтемені ашу мүмкін болмады')),
         );
       }
     }
@@ -99,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: Colors.green.shade50,
       appBar: AppBar(
         backgroundColor: Colors.green.shade100,
-        title: const Text('Настройки'),
+        title: const Text('Баптаулар'),
         iconTheme: IconThemeData(color: Colors.green.shade900),
         titleTextStyle: TextStyle(
           color: Colors.green.shade900,
@@ -131,7 +131,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Icon(Icons.warning_amber_rounded, color: Colors.orange.shade800),
                               const SizedBox(width: 8),
                               Text(
-                                'Внимание!',
+                                'Назар аударыңыз!',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -142,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Для работы приложения необходим API ключ OpenRouter. Без него анализ изображений будет недоступен.',
+                            'Қосымшаның жұмыс істеуі үшін OpenRouter API кілті қажет. Онсыз суреттерді талдау мүмкін болмайды.',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.orange.shade900,
@@ -164,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Как получить API ключ:',
+                              'API кілтін қалай алуға болады:',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -173,7 +173,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              '1. Перейдите на сайт OpenRouter',
+                              '1. OpenRouter сайтына өтіңіз',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.green.shade900,
@@ -183,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ElevatedButton.icon(
                               onPressed: _launchOpenRouter,
                               icon: const Icon(Icons.open_in_new),
-                              label: const Text('Открыть OpenRouter'),
+                              label: const Text('OpenRouter ашу'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green.shade600,
                                 foregroundColor: Colors.white,
@@ -191,7 +191,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              '2. Зарегистрируйтесь на сайте (можно через Google или GitHub)',
+                              '2. Сайтта тіркеліңіз (Google немесе GitHub арқылы болады)',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.green.shade900,
@@ -199,7 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '3. Выберите модель Google: Gemma 3 4B (бесплатно) или иную подходящую',
+                              '3. Google: Gemma 3 4B (тегін) немесе басқа сәйкес келетін модельді таңдаңыз',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.green.shade900,
@@ -207,7 +207,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '4. Нажмите "Создание ключа API"',
+                              '4. "API кілтін жасау" түймесін басыңыз',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.green.shade900,
@@ -215,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '5. Скопируйте полученный ключ в поле ниже',
+                              '5. Алынған кілтті төмендегі өріске көшіріңіз',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.green.shade900,
@@ -235,8 +235,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: SwitchListTile.adaptive(
                         value: _remindersEnabled,
                         onChanged: _setRemindersEnabled,
-                        title: const Text('Напоминания о сортировке'),
-                        subtitle: const Text('FCM-уведомления о ежедневной сортировке.'),
+                        title: const Text('Сұрыптау туралы еске салғыштар'),
+                        subtitle: const Text('Күнделікті сұрыптау туралы FCM-хабарландырулар.'),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -246,14 +246,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: TextField(
                             controller: _apiKeyController,
                             decoration: InputDecoration(
-                              labelText: 'API ключ OpenRouter',
-                              hintText: 'Введите ваш API ключ',
+                              labelText: 'OpenRouter API кілті',
+                              hintText: 'API кілтіңізді енгізіңіз',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
                               fillColor: Colors.white,
-                              helperText: 'Ключ должен начинаться с "sk-or-v1-"',
+                              helperText: 'Кілт "sk-or-v1-" деп басталуы керек',
                               helperStyle: TextStyle(color: Colors.green.shade700),
                             ),
                           ),
@@ -262,7 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         IconButton(
                           onPressed: _clearApiKey,
                           icon: Icon(Icons.clear, color: Colors.red.shade400),
-                          tooltip: 'Очистить ключ',
+                          tooltip: 'Кілтті тазарту',
                           style: IconButton.styleFrom(
                             backgroundColor: Colors.red.shade50,
                             padding: const EdgeInsets.all(12),
@@ -277,7 +277,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ElevatedButton.icon(
                           onPressed: _saveApiKey,
                           icon: const Icon(Icons.save),
-                          label: const Text('Сохранить ключ'),
+                          label: const Text('Кілтті сақтау'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green.shade600,
                             foregroundColor: Colors.white,

@@ -33,7 +33,7 @@ class AuthService {
     if (uid == null) {
       throw FirebaseAuthException(
         code: 'registration_failed',
-        message: 'Не удалось получить UID после регистрации.',
+        message: 'Тіркелгеннен кейін UID алу мүмкін болмады.',
       );
     }
 
@@ -59,13 +59,29 @@ class AuthService {
       }
 
       // On some devices token propagation after sign-up is slightly delayed.
-      await Future<void>.delayed(const Duration(milliseconds: 500));
-      await credential.user?.getIdToken(true);
-      await _upsertUserProfile(user);
-      await _leaderboardService.ensureUserEntry(
-        userId: user.id,
-        displayName: user.name,
-      );
+      // Use a retry mechanism to wait for the token to propagate.
+      bool success = false;
+      int retries = 5;
+      
+      while (retries > 0 && !success) {
+        await Future<void>.delayed(const Duration(milliseconds: 1000));
+        await credential.user?.getIdToken(true);
+        try {
+          await _upsertUserProfile(user);
+          await _leaderboardService.ensureUserEntry(
+            userId: user.id,
+            displayName: user.name,
+          );
+          success = true;
+        } on FirebaseException catch (retryError) {
+          if (retryError.code == 'permission-denied' && retries > 1) {
+            retries--;
+            continue;
+          }
+          debugPrint('registerWithEmail profile set failed after retries: $retryError');
+          rethrow;
+        }
+      }
     } catch (error, stackTrace) {
       debugPrint('registerWithEmail profile set failed: $error');
       debugPrintStack(stackTrace: stackTrace);
@@ -142,9 +158,9 @@ class AuthService {
   String _extractNameFromEmail(String email) {
     final local = email.split('@').first.trim();
     if (local.isEmpty) {
-      return 'Пользователь';
+      return 'Пайдаланушы';
     }
 
-    return local.length >= 2 ? local : 'Пользователь';
+    return local.length >= 2 ? local : 'Пайдаланушы';
   }
 }

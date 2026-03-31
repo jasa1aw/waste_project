@@ -12,7 +12,7 @@ class LeaderboardScreen extends StatelessWidget {
     final me = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Глобальный рейтинг')),
+      appBar: AppBar(title: const Text('Жаһандық рейтинг')),
       body: StreamBuilder<List<LeaderboardEntry>>(
         stream: LeaderboardService().watchTopUsers(limit: 100),
         builder: (context, snapshot) {
@@ -22,14 +22,14 @@ class LeaderboardScreen extends StatelessWidget {
 
           if (snapshot.hasError) {
             return Center(
-                child: Text('Ошибка загрузки рейтинга: ${snapshot.error}'));
+                child: Text('Рейтингті жүктеу қатесі: ${snapshot.error}'));
           }
 
           final rows = snapshot.data ?? const <LeaderboardEntry>[];
           if (rows.isEmpty) {
             return const Center(
               child: Text(
-                  'Рейтинг пока пуст. Сделайте первый скан и возглавьте таблицу.'),
+                  'Рейтинг әзірге бос. Алғашқы сканерлеуді жасап, кестені бастаңыз.'),
             );
           }
 
@@ -85,7 +85,7 @@ class LeaderboardScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                              'Сканов: ${row.scansCount}  |  Streak: ${row.streakDays} дн.'),
+                              'Сканерлеу: ${row.scansCount}  |  Қатарынан: ${row.streakDays} күн'),
                         ],
                       ),
                     ),

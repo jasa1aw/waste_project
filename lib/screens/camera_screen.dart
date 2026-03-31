@@ -31,7 +31,7 @@ class _CameraScreenState extends State<CameraScreen> {
       if (cameras.isEmpty) {
         setState(() {
           _hasError = true;
-          _errorMessage = 'Камера не найдена';
+          _errorMessage = 'Камера табылмады';
         });
         return;
       }
@@ -56,7 +56,7 @@ class _CameraScreenState extends State<CameraScreen> {
     } catch (e) {
       setState(() {
         _hasError = true;
-        _errorMessage = 'Ошибка инициализации камеры: $e';
+        _errorMessage = 'Камераны іске қосу қатесі: $e';
       });
     }
   }
@@ -92,7 +92,7 @@ class _CameraScreenState extends State<CameraScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка при выборе изображения: $e')),
+        SnackBar(content: Text('Суретті таңдау кезінде қате орын алды: $e')),
       );
     }
   }
@@ -122,7 +122,7 @@ class _CameraScreenState extends State<CameraScreen> {
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text('Қате: $e')),
         );
       } finally {
         if (mounted) {
@@ -151,17 +151,17 @@ class _CameraScreenState extends State<CameraScreen> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              Text(_errorMessage ?? 'Произошла ошибка'),
+              Text(_errorMessage ?? 'Қате орын алды'),
               const SizedBox(height: 8),
               Text(
-                'На симуляторе камера недоступна. Используйте галерею.',
+                'Симуляторда камера қолжетімсіз. Галереяны пайдаланыңыз.',
                 style: TextStyle(color: Colors.grey.shade700),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _pickImage,
-                child: const Text('Выбрать из галереи'),
+                child: const Text('Галереядан таңдау'),
               ),
             ],
           ),
@@ -199,7 +199,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      'Сделай фото или выбери из галереи, чтобы узнать, как правильно утилизировать отходы!',
+                      'Қалдықтарды қалай дұрыс тастау керектігін білу үшін суретке түсіріңіз немесе галереядан таңдаңыз!',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -219,7 +219,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                 : () => _getImage(ImageSource.camera),
                             icon: const Icon(Icons.camera_alt,
                                 color: Colors.white),
-                            label: const Text('Сделать фото',
+                            label: const Text('Суретке түсіру',
                                 style: TextStyle(color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
@@ -237,7 +237,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                 : () => _getImage(ImageSource.gallery),
                             icon: const Icon(Icons.photo_library,
                                 color: Colors.white),
-                            label: const Text('Выбрать из галереи',
+                            label: const Text('Галереядан таңдау',
                                 style: TextStyle(color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
