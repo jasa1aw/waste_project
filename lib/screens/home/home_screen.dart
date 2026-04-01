@@ -19,143 +19,148 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, authSnapshot) {
+        final user = authSnapshot.data;
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).brightness == Brightness.light
-                  ? const Color(0xFFEAF8EE)
-                  : const Color(0xFF121A16),
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
+        return Scaffold(
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Theme.of(context).brightness == Brightness.light
+                      ? const Color(0xFFEAF8EE)
+                      : const Color(0xFF121A16),
+                  Theme.of(context).scaffoldBackgroundColor,
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                children: [
+                  _TopBar(user: user),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Ақылмен сұрыпта.\nЭкологиялық таза өмір сүр.',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Қалдықтарды жылдам сканерлеп, нақты нұсқаулар ал.',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).brightness == Brightness.light
+                              ? AppTheme.textSecondaryLight
+                              : AppTheme.textSecondaryDark,
+                        ),
+                  ),
+                  const SizedBox(height: 26),
+                  PremiumActionButton(
+                    label: 'Сканерлеу',
+                    icon: Icons.center_focus_strong,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CameraScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: PremiumActionButton(
+                          label: 'Сканерлеу тарихы',
+                          icon: Icons.history_rounded,
+                          backgroundColor: const Color(0xFF6366F1),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const ScanHistoryScreen()),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _QuickTypesRow(),
+                  const SizedBox(height: 20),
+                  _StatsPreview(user: user),
+                  const SizedBox(height: 20),
+                  _EngagementHub(user: user),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: PremiumActionButton(
+                          label: 'Профиль',
+                          icon: Icons.person_outline,
+                          backgroundColor: const Color(0xFF0D9488),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => user == null
+                                    ? const AuthScreen()
+                                    : const ProfileScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: PremiumActionButton(
+                          label: 'Қабылдау пунктері',
+                          icon: Icons.map_outlined,
+                          backgroundColor: const Color(0xFF2563EB),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const MapScreen()),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: PremiumActionButton(
+                          label: 'Баптаулар',
+                          icon: Icons.tune,
+                          backgroundColor: const Color(0xFF34A853),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SettingsScreen()),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-            children: [
-              _TopBar(user: user),
-              const SizedBox(height: 20),
-              Text(
-                'Ақылмен сұрыпта.\nЭкологиялық таза өмір сүр.',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Қалдықтарды жылдам сканерлеп, нақты нұсқаулар ал.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? AppTheme.textSecondaryLight
-                          : AppTheme.textSecondaryDark,
-                    ),
-              ),
-              const SizedBox(height: 26),
-              PremiumActionButton(
-                label: 'Сканерлеу',
-                icon: Icons.center_focus_strong,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const CameraScreen()),
-                  );
-                },
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: PremiumActionButton(
-                      label: 'Сканерлеу тарихы',
-                      icon: Icons.history_rounded,
-                      backgroundColor: const Color(0xFF6366F1),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ScanHistoryScreen()),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _QuickTypesRow(),
-              const SizedBox(height: 20),
-              _StatsPreview(user: user),
-              const SizedBox(height: 20),
-              _EngagementHub(user: user),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: PremiumActionButton(
-                      label: 'Профиль',
-                      icon: Icons.person_outline,
-                      backgroundColor: const Color(0xFF0D9488),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => user == null
-                                ? const AuthScreen()
-                                : const ProfileScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: PremiumActionButton(
-                      label: 'Қабылдау пунктері',
-                      icon: Icons.map_outlined,
-                      backgroundColor: const Color(0xFF2563EB),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const MapScreen()),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: PremiumActionButton(
-                      label: 'Баптаулар',
-                      icon: Icons.tune,
-                      backgroundColor: const Color(0xFF34A853),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SettingsScreen()),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

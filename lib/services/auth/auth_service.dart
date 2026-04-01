@@ -45,47 +45,42 @@ class AuthService {
       createdAt: DateTime.now(),
     );
 
+    // Auth user created — profile & leaderboard setup is best-effort.
+    // signInWithEmail already backfills the profile if it doesn't exist.
     await credential.user?.getIdToken(true);
 
-    try {
-      await _upsertUserProfile(user);
-      await _leaderboardService.ensureUserEntry(
-        userId: user.id,
-        displayName: user.name,
-      );
-    } on FirebaseException catch (error) {
-      if (error.code != 'permission-denied') {
-        rethrow;
-      }
-
-      // On some devices token propagation after sign-up is slightly delayed.
-      // Use a retry mechanism to wait for the token to propagate.
-      bool success = false;
-      int retries = 5;
-      
-      while (retries > 0 && !success) {
-        await Future<void>.delayed(const Duration(milliseconds: 1000));
-        await credential.user?.getIdToken(true);
-        try {
-          await _upsertUserProfile(user);
-          await _leaderboardService.ensureUserEntry(
-            userId: user.id,
-            displayName: user.name,
-          );
-          success = true;
-        } on FirebaseException catch (retryError) {
-          if (retryError.code == 'permission-denied' && retries > 1) {
-            retries--;
-            continue;
-          }
-          debugPrint('registerWithEmail profile set failed after retries: $retryError');
-          rethrow;
+    for (int attempt = 1; attempt <= 5; attempt++) {
+      try {
+        await _upsertUserProfile(user);
+        await _leaderboardService.ensureUserEntry(
+          userId: user.id,
+          displayName: user.name,
+        );
+        return; // Profile setup succeeded
+      } on FirebaseException catch (error) {
+        if (error.code != 'permission-denied') {
+          // Non-permission error — log and skip. Auth user is already created.
+          debugPrint('registerWithEmail profile setup error: $error');
+          return;
         }
+        debugPrint(
+            'Profile setup attempt $attempt/5 failed (permission-denied)');
+        if (attempt < 5) {
+          await Future<void>.delayed(Duration(milliseconds: 800 * attempt));
+          await credential.user?.getIdToken(true);
+        } else {
+          // All retries exhausted — suppress. Profile will be created on
+          // next signInWithEmail() which already handles missing profiles.
+          debugPrint(
+              'Profile setup skipped after $attempt retries. '
+              'Will complete on next login.');
+        }
+      } catch (error, stackTrace) {
+        debugPrint('registerWithEmail profile setup failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+        // Don't rethrow — the Firebase Auth account was created successfully.
+        return;
       }
-    } catch (error, stackTrace) {
-      debugPrint('registerWithEmail profile set failed: $error');
-      debugPrintStack(stackTrace: stackTrace);
-      rethrow;
     }
   }
 

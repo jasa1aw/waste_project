@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart'; // Added
 import 'package:razdelchik/models/scan_record.dart';
 import 'package:razdelchik/models/waste_type.dart';
 
@@ -21,13 +22,27 @@ class ScanHistoryService {
   final FirebaseFirestore _firestore;
 
   Future<void> addScanRecord(ScanRecord record) async {
+    // Critical: save the scan record itself.
     await _firestore.collection('scan_history').add(record.toMap());
-    await _firestore.collection('users').doc(record.userId).update({
-      'ecoPoints': FieldValue.increment(record.pointsAwarded),
-      'lastScanAt': DateTime.now().toIso8601String(),
-    });
 
-    await _syncLeaderboard(record);
+    // Secondary: update user stats. Non-critical — don't let
+    // failures here surface as a "save failed" error to the user.
+    try {
+      await _firestore.collection('users').doc(record.userId).update({
+        'ecoPoints': FieldValue.increment(record.pointsAwarded),
+        'lastScanAt': DateTime.now().toIso8601String(),
+      });
+    } catch (e) {
+      debugPrint('addScanRecord: user stats update failed: $e');
+    }
+
+    // Secondary: sync leaderboard (uses a transaction, can fail on
+    // slow networks). Non-critical for the scan save UX.
+    try {
+      await _syncLeaderboard(record);
+    } catch (e) {
+      debugPrint('addScanRecord: leaderboard sync failed: $e');
+    }
   }
 
   Future<void> _syncLeaderboard(ScanRecord record) async {
