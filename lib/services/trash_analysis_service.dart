@@ -8,7 +8,7 @@ class TrashAnalysisService {
   static const List<String> _modelFallbacks = <String>[
     'google/gemini-2.0-flash-001',
     'google/gemini-2.0-flash-lite-001',
-    'google/gemini-1.5-flash',
+    'google/gemini-flash-1.5',
   ];
 
   static const String _universalPrompt = '''
