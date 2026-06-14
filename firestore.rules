@@ -28,7 +28,8 @@ service cloud.firestore {
     match /scan_history/{scanId} {
       allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid
+        || isAdmin();
     }
 
     match /waste_items/{itemId} {
@@ -47,6 +48,25 @@ service cloud.firestore {
       allow create, update: if isOwner(userId)
         && request.resource.data.userId == request.auth.uid;
       allow delete: if isAdmin();
+    }
+
+    // Admin-only leaderboard collection (queried by AdminAnalyticsService)
+    match /leaderboard/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Admin audit log — admin can read and write; no regular-user access
+    match /adminAuditLog/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Unblock appeals from blocked users; admins can read and update
+    match /admin_messages/{msgId} {
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.type == 'unblock_request'
+        && request.resource.data.status == 'unread';
+      allow read, update, delete: if isAdmin();
     }
   }
 }
