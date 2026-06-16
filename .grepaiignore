@@ -1,0 +1,15 @@
+# Зависимости и сборка
+node_modules/
+build/
+dist/
+.git/
+
+# Платформенные папки сборки (если это Flutter / React Native / Electron)
+windows/
+macOS/
+ios/
+android/
+
+# Логи и кэш Claude
+.claude/worktrees/
+.claude/cache/

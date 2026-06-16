@@ -1,14 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:razdelchik/core/theme/app_theme.dart';
+import 'package:razdelchik/models/app_user.dart';
 import 'package:razdelchik/screens/auth/auth_screen.dart';
 import 'package:razdelchik/screens/camera_screen.dart';
 import 'package:razdelchik/screens/leaderboard_screen.dart';
 import 'package:razdelchik/screens/map_screen.dart';
 import 'package:razdelchik/screens/profile_screen.dart';
+import 'package:razdelchik/screens/admin/admin_shell.dart';
 import 'package:razdelchik/screens/scan_history_screen.dart'; // Added
 import 'package:razdelchik/screens/settings_screen.dart';
 import 'package:razdelchik/screens/stats/stats_screen.dart';
+import 'package:razdelchik/services/auth/auth_service.dart';
 import 'package:razdelchik/services/leaderboard_service.dart';
 import 'package:razdelchik/services/stats/scan_history_service.dart';
 import 'package:razdelchik/widgets/common/premium_action_button.dart';
@@ -155,6 +158,40 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (user != null)
+                    StreamBuilder<AppUser?>(
+                      stream: AuthService().watchProfile(user.uid),
+                      builder: (context, profileSnapshot) {
+                        final appUser = profileSnapshot.data;
+                        if (appUser == null || !appUser.isAdmin) {
+                          return const SizedBox.shrink();
+                        }
+                        return Column(
+                          children: [
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: PremiumActionButton(
+                                    label: 'Әкімші панелі',
+                                    icon: Icons.shield_rounded,
+                                    backgroundColor: const Color(0xFF7C3AED),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AdminShell()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                 ],
               ),
             ),

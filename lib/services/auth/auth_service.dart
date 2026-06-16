@@ -114,6 +114,16 @@ class AuthService {
       await _upsertUserProfile(user);
     } else {
       final map = profileDoc.data();
+      if (map?['isBlocked'] == true) {
+        // Stay signed in so the blocked user can still submit an unblock
+        // appeal (Firestore rules require request.auth != null and
+        // userId == request.auth.uid). Sign-out happens when the appeal
+        // dialog closes — see BlockedUserDialog.
+        throw BlockedUserException(
+          userId: uid,
+          userEmail: email,
+        );
+      }
       displayName = (map?['name'] as String?)?.trim().isNotEmpty == true
           ? map!['name'] as String
           : displayName;
@@ -159,3 +169,10 @@ class AuthService {
     return local.length >= 2 ? local : 'Пайдаланушы';
   }
 }
+
+class BlockedUserException implements Exception {
+  const BlockedUserException({required this.userId, required this.userEmail});
+  final String userId;
+  final String userEmail;
+}
+

@@ -5,6 +5,8 @@ class AppUser {
     required this.email,
     required this.ecoPoints,
     required this.createdAt,
+    this.isBlocked = false,
+    this.role = 'user',
   });
 
   final String id;
@@ -12,6 +14,10 @@ class AppUser {
   final String email;
   final int ecoPoints;
   final DateTime createdAt;
+  final bool isBlocked;
+  final String role;
+
+  bool get isAdmin => role == 'admin';
 
   String get level {
     if (ecoPoints >= 1000) return 'Эко батыр';
@@ -26,6 +32,7 @@ class AppUser {
       'email': email,
       'ecoPoints': ecoPoints,
       'createdAt': createdAt.toIso8601String(),
+      'isBlocked': isBlocked,
     };
   }
 
@@ -37,6 +44,8 @@ class AppUser {
       ecoPoints: (map['ecoPoints'] as num?)?.toInt() ?? 0,
       createdAt: DateTime.tryParse(map['createdAt'] as String? ?? '') ??
           DateTime.now(),
+      isBlocked: map['isBlocked'] as bool? ?? false,
+      role: map['role'] as String? ?? 'user',
     );
   }
 }

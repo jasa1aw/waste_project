@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:razdelchik/screens/profile_screen.dart';
 import 'package:razdelchik/services/auth/auth_service.dart';
+import 'package:razdelchik/services/admin/admin_messages_service.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -58,6 +59,19 @@ class _AuthScreenState extends State<AuthScreen> {
         context,
         MaterialPageRoute(builder: (context) => const ProfileScreen()),
       );
+    } on BlockedUserException catch (e) {
+      if (!mounted) return;
+      // The user is still signed in here so the unblock appeal can pass
+      // Firestore rules. Sign out only after the dialog is dismissed.
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => BlockedUserDialog(
+          userId: e.userId,
+          userEmail: e.userEmail,
+        ),
+      );
+      await FirebaseAuth.instance.signOut();
     } on FirebaseAuthException catch (error) {
       if (!mounted) {
         return;
@@ -169,6 +183,167 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class BlockedUserDialog extends StatefulWidget {
+  const BlockedUserDialog({
+    super.key,
+    required this.userId,
+    required this.userEmail,
+  });
+
+  final String userId;
+  final String userEmail;
+
+  @override
+  State<BlockedUserDialog> createState() => _BlockedUserDialogState();
+}
+
+class _BlockedUserDialogState extends State<BlockedUserDialog> {
+  final _service = AdminMessagesService();
+  final _controller = TextEditingController();
+  bool _showAppeal = false;
+  bool _submitting = false;
+  bool _submitted = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _sendAppeal() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    setState(() => _submitting = true);
+    try {
+      await _service.sendAppeal(
+        userId: widget.userId,
+        userEmail: widget.userEmail,
+        message: text,
+      );
+      if (mounted) setState(() => _submitted = true);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Қате: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Row(
+        children: [
+          Icon(Icons.lock_outline, color: cs.error),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Аккаунт бұғатталған',
+              style: tt.titleLarge?.copyWith(color: cs.error),
+            ),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 360,
+        child: SingleChildScrollView(
+          child: _submitted
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle_outline,
+                        color: Colors.green, size: 48),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Хабарламаңыз жіберілді. Әкімші қарастырады.',
+                      style: tt.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Сіздің аккаунтыңыз бұғатталған.',
+                      style:
+                          tt.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Егер бұл қате деп санасаңыз, әкімшіге хабарлама жіберіңіз.',
+                      style: tt.bodyMedium?.copyWith(
+                        color: cs.onSurface.withOpacity(0.65),
+                      ),
+                    ),
+                    if (_showAppeal) ...[
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _controller,
+                        maxLines: 3,
+                        maxLength: 500,
+                        decoration: InputDecoration(
+                          labelText: 'Хабарлама',
+                          hintText: 'Сіздің жағдайыңызды түсіндіріңіз...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+        ),
+      ),
+      actions: _submitted
+          ? [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Жабу'),
+              ),
+            ]
+          : _showAppeal
+              ? [
+                  TextButton(
+                    onPressed: _submitting
+                        ? null
+                        : () => setState(() => _showAppeal = false),
+                    child: const Text('Артқа'),
+                  ),
+                  FilledButton(
+                    onPressed: _submitting ? null : _sendAppeal,
+                    child: _submitting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Жіберу'),
+                  ),
+                ]
+              : [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Жабу'),
+                  ),
+                  FilledButton.icon(
+                    onPressed: () => setState(() => _showAppeal = true),
+                    icon: const Icon(Icons.mail_outline, size: 18),
+                    label: const Text('Әкімшіге хабарлау'),
+                  ),
+                ],
     );
   }
 }

@@ -6,9 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TrashAnalysisService {
   static const List<String> _modelFallbacks = <String>[
-    'google/gemini-2.0-flash-001',
-    'google/gemini-2.0-flash-lite-001',
-    'google/gemini-flash-1.5',
+    'google/gemini-2.5-flash',
+    'google/gemini-2.5-flash-lite',
+    'google/gemini-3.5-flash',
   ];
 
   static const String _universalPrompt = '''
@@ -78,7 +78,8 @@ class TrashAnalysisService {
                 }
               ]
             }
-          ]
+          ],
+          "max_tokens": 4000,
         };
 
         final response = await http.post(
